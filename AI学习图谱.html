@@ -122,10 +122,10 @@ function refreshProgress(){
  for(const el of $('outline').querySelectorAll('[data-total]')){const s=progress.get(el.dataset.total);el.textContent=`预计 ${fmt(s.hours)} h · 已完成 ${fmt(s.progress*100)}%`;}
  paintProgress();
 }
-function persist(){
- if(storageBlocked){storageDirty=true;saveNotice('仅保留在本次页面，请导出备份',true);return;}
- try{localStorage.setItem(P.KEY,JSON.stringify(model.snapshot()));storageDirty=false;saveNotice('已保存 · '+new Date().toLocaleTimeString('zh-CN',{hour12:false}));}
- catch{storageDirty=true;saveNotice('保存失败，请导出记录备份',true);}
+function persist({recover=false}={}){
+ if(storageBlocked&&!recover){storageDirty=true;saveNotice('仅保留在本次页面，请导出备份',true);return false;}
+ try{localStorage.setItem(P.KEY,JSON.stringify(model.snapshot()));storageBlocked=false;storageDirty=false;saveNotice('已保存 · '+new Date().toLocaleTimeString('zh-CN',{hour12:false}));return true;}
+ catch{storageDirty=true;saveNotice('保存失败，请导出记录备份',true);return false;}
 }
 function commit(id,update){
  try{
@@ -173,6 +173,8 @@ function computeVisible(){
    // Coarse views keep prerequisite arrows at the same level. Coloring uses
    // the displayed source's true aggregate, never one completed hidden child.
    const level=Math.min(rank[byId(s).type],rank[byId(t).type]);
+   // Chapter prerequisites do not imply that an entire domain comes first.
+   if(type==='pre'&&level===rank.domain)continue;
    while(s&&rank[byId(s).type]>level)s=rep(byId(s).parent);
    while(t&&rank[byId(t).type]>level)t=rep(byId(t).parent);
   }
@@ -244,7 +246,7 @@ function search(){const q=$('search').value.trim().toLowerCase();if(!q){$('searc
 function openSidebar(){$('sidebar').classList.add('open');$('scrim').hidden=false;}
 function closeSidebar(){$('sidebar').classList.remove('open');$('scrim').hidden=true;}
 function downloadRecords(){const url=URL.createObjectURL(new Blob([JSON.stringify(model.snapshot(),null,2)],{type:'application/json;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='AI学习记录-'+new Date().toISOString().slice(0,10)+'.json';a.hidden=true;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
-async function prepareImport(file){try{if(file.size>2e6)throw Error('文件过大，请选择学习记录 JSON');stagedImport=model.validate(JSON.parse(await file.text()));const count=Object.keys(stagedImport).length,done=Object.values(stagedImport).filter(r=>r.completed).length,overlap=Object.keys(stagedImport).filter(id=>Object.hasOwn(model.snapshot().records,id)).length;if(!count)throw Error('文件中没有学习记录');$('importPreview').textContent=`${count} 个章节，${done} 个已完成；${overlap} 个同名记录将被覆盖。`;$('importDialog').showModal();}catch(e){stagedImport=null;toast('未导入：'+e.message);}}
+async function prepareImport(file){try{if(file.size>2e6)throw Error('文件过大，请选择学习记录 JSON');stagedImport=model.validate(JSON.parse(await file.text()));const count=Object.keys(stagedImport).length,done=Object.values(stagedImport).filter(r=>r.completed).length,overlap=Object.keys(stagedImport).filter(id=>Object.hasOwn(model.snapshot().records,id)).length;if(!count)throw Error('文件中没有学习记录');$('importPreview').textContent=`${count} 个章节，${done} 个已完成；${overlap} 个同名记录将被覆盖。`+(storageBlocked?' 本机原记录无法读取；确认后将用当前页面与导入记录恢复保存。':'');$('importDialog').showModal();}catch(e){stagedImport=null;toast('未导入：'+e.message);}}
 document.addEventListener('click',ev=>{
  const close=ev.target.closest('[data-close]');if(close){$(close.dataset.close).close();return;}
  const info=ev.target.closest('[data-info]');if(info){ev.preventDefault();showInfo(info.dataset.info);return;}
@@ -265,7 +267,7 @@ $('resetView').onclick=resetView;$('emptyReset').onclick=resetView;$('fit').oncl
 $('motion').onclick=()=>{if(state.layout==='tree'){toast('层次布局保持固定；切换网络布局可启用动态');return;}state.paused=!state.paused;if(state.paused)stop();else{iteration=80;raf=requestAnimationFrame(tick);}syncControls();};
 $('mobileMenu').onclick=openSidebar;$('closeSidebar').onclick=closeSidebar;$('scrim').onclick=closeSidebar;$('help').onclick=()=>$('helpDialog').showModal();
 $('exportProgress').onclick=downloadRecords;$('importProgress').onclick=()=>{$('importFile').value='';$('importFile').click();};$('importFile').onchange=()=>{if($('importFile').files[0])prepareImport($('importFile').files[0]);};
-$('confirmImport').onclick=()=>{if(!stagedImport)return;try{if(!storageBlocked&&!storageDirty)model.replace(readStored());model.replace({...model.snapshot().records,...stagedImport});persist();refreshProgress();$('importDialog').close();stagedImport=null;toast('学习记录已合并');}catch(e){toast('未导入：'+e.message);}};
+$('confirmImport').onclick=()=>{if(!stagedImport)return;try{if(!storageBlocked&&!storageDirty)model.replace(readStored());model.replace({...model.snapshot().records,...stagedImport});const saved=persist({recover:true});refreshProgress();$('importDialog').close();stagedImport=null;toast(saved?'学习记录已合并并保存':'已合并到当前页面，保存失败，请导出备份');}catch(e){toast('未导入：'+e.message);}};
 addEventListener('storage',e=>{if(e.key===P.KEY&&!storageDirty&&!storageBlocked){try{model.replace(readStored());refreshProgress();saveNotice('已同步本机其他页面的记录');}catch{saveNotice('检测到无效记录，当前页面未覆盖',true);}}});
 document.addEventListener('keydown',e=>{const editing=/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);if(e.key==='Escape'){for(const d of document.querySelectorAll('dialog[open]'))d.close();closeSidebar();return;}if(editing||document.querySelector('dialog[open]'))return;if(e.key==='/'){e.preventDefault();if(innerWidth<=760)openSidebar();$('search').focus();}if(e.key==='+'||e.key==='='){e.preventDefault();zoom(1.2);}if(e.key==='-'){e.preventDefault();zoom(1/1.2);}if(e.key==='Home'){e.preventDefault();fit();}if(document.activeElement===svg&&e.key.startsWith('Arrow')){e.preventDefault();transform.x+=e.key==='ArrowLeft'?40:e.key==='ArrowRight'?-40:0;transform.y+=e.key==='ArrowUp'?40:e.key==='ArrowDown'?-40:0;updateTransform();}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();else if(!state.paused&&state.layout==='network'&&iteration<240)raf=requestAnimationFrame(tick);});

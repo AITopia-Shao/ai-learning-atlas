@@ -11,6 +11,11 @@ module.exports=async({send,evaluate,click,change,shot,state,assert,sleep,out,err
  assert(await evaluate(`document.querySelectorAll('.node.complete,.edge.complete').length===0`),'Every initial node and edge is gray');
  assert(requests.every(u=>!/^https?:/.test(u)),'No remote requests on load');
  await shot('01-clean-default');
+ await change('depth','1');
+ assert(!(await state()).edges.some(e=>e.type==='pre'),'Domain overview does not invent whole-domain prerequisites');
+ await click('#related');assert((await state()).edges.some(e=>e.type==='related'),'Domain knowledge associations remain available');
+ await click('#related');await change('depth','2');
+ assert((await state()).edges.some(e=>e.type==='pre'&&e.source==='python'&&e.target==='abstraction'),'Course prerequisites remain available');
  await click('#outline [data-node="la"]');await click('[data-expand="la"]');
  assert((await state()).visible.includes('la.space'),'Course expands to chapters');
  await mark('la.space');assert(!(await progress())['la.space'].complete,'Completion requires a score');
@@ -83,5 +88,23 @@ module.exports=async({send,evaluate,click,change,shot,state,assert,sleep,out,err
  await click('[data-info="rlpractice.r4"]');assert(await evaluate(`document.getElementById('details').open&&document.querySelectorAll('#detailBody a.resource-link').length>=2`),'Materials available on demand without right rail');
  await send('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape'});await send('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',code:'Escape'});assert(!await evaluate(`document.getElementById('details').open`),'Escape closes details');
  await click('#closeSidebar');const z=(await state()).zoom;await send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:140,y:420,id:1},{x:240,y:420,id:2}]});await send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:100,y:420,id:1},{x:280,y:420,id:2}]});await send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assert((await state()).zoom>z,'Touch pinch zoom');
+ // Recover a corrupt local snapshot only after confirming a valid backup.
+ const backup=await records();
+ await evaluate(`localStorage.setItem(LearningProgress.KEY,'{broken json')`);await send('Page.reload');await waitFor(`document.body?.dataset.ready==='true'`);
+ await upload(invalid);await sleep(120);
+ assert(await evaluate(`localStorage.getItem(LearningProgress.KEY)==='{broken json'&&!document.getElementById('importDialog').open`),'Invalid backup leaves corrupt storage untouched');
+ await upload(backup);await waitFor(`document.getElementById('importDialog').open`);
+ assert(await evaluate(`document.getElementById('importPreview').textContent.includes('本机原记录无法读取')&&localStorage.getItem(LearningProgress.KEY)==='{broken json'`),'Recovery preview warns before replacing unreadable storage');
+ await click('#confirmImport');
+ assert(await evaluate(`!document.getElementById('saveStatus').classList.contains('error')&&document.getElementById('toast').textContent==='学习记录已合并并保存'`),'Confirmed backup restores persistent storage');
+ await send('Page.reload');await waitFor(`document.body?.dataset.ready==='true'`);
+ assert(JSON.stringify((await records()).records)===JSON.stringify(backup.records),'Recovered backup survives reload');
+ // A browser that still refuses writes must not report a saved import.
+ const persisted=await evaluate(`localStorage.getItem(LearningProgress.KEY)`),denied={...backup,records:{'la.space':{completed:true,score:63,hours:14,updatedAt:''}}};
+ await evaluate(`window.originalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException('Storage denied','SecurityError')}`);
+ await upload(denied);await waitFor(`document.getElementById('importDialog').open`);await click('#confirmImport');
+ assert((await records()).records['la.space'].score===63&&await evaluate(`document.getElementById('saveStatus').classList.contains('error')&&document.getElementById('toast').textContent.includes('保存失败')`),'Denied import keeps session records and reports save failure');
+ assert(await evaluate(`localStorage.getItem(LearningProgress.KEY)` )===persisted,'Denied import does not change the persisted backup');
+ await evaluate(`Storage.prototype.setItem=window.originalSet`);
  assert(errors.length===0,'No JavaScript errors',errors);assert(requests.every(u=>!/^https?:/.test(u)),'All interactions remain offline');
 };
