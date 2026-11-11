@@ -1,0 +1,15 @@
+{
+  "name": "ai-learning-atlas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI 自学课程体系、离线交互知识图谱与章节学习记录",
+  "scripts": {
+    "build": "python graph/build_graph.py",
+    "check": "python scripts/check_project.py",
+    "test": "node --test graph/progress.test.cjs",
+    "test:browser": "node graph/qa.cjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

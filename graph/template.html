@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark"><title>AI 学习图谱</title><style>/*__STYLE__*/</style></head>
+<body>
+<div class="workspace">
+ <aside id="sidebar" aria-label="学习目录与记录">
+  <div class="sidebar-top"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="搜索课程、章节、资料" aria-label="搜索课程、章节、资料" autocomplete="off"><kbd>/</kbd></label><button id="settingsToggle" class="icon" aria-label="视图设置" aria-expanded="false">⚙</button><button id="closeSidebar" class="icon mobile" aria-label="关闭目录">×</button></div>
+  <div id="searchResults" hidden aria-live="polite"></div>
+  <section id="settings" hidden aria-label="视图设置">
+   <label>层级<select id="depth"><option value="1">领域</option><option value="2" selected>课程</option><option value="3">章节</option><option value="4">资料链接</option></select></label>
+   <label>布局<select id="layout"><option value="network">网络</option><option value="tree">层次</option></select></label>
+   <label class="check"><input id="pre" type="checkbox" checked>先修箭头</label><label class="check"><input id="related" type="checkbox">知识关联</label><label class="check"><input id="optional" type="checkbox" checked>显示选修</label>
+   <label>领域<select id="domain"><option value="all">全部领域</option></select></label><button id="resetView">重置视图</button>
+  </section>
+  <nav id="outline" aria-label="学习目录，章节可勾选完成并打分"></nav>
+  <div class="sidebar-bottom"><div class="score-legend" title="未完成为灰色；完成后由 0 分的红色连续变化到 100 分的绿色"><span class="gray-dot"></span><span>未完成</span><span class="spectrum"></span><span>0–100 分</span></div><div class="storage-row"><span id="saveStatus" role="status">记录保存在本机</span><button id="help" class="icon" aria-label="计分规则与操作说明">?</button></div><div class="backup-actions"><button id="exportProgress">导出记录</button><button id="importProgress">导入记录</button></div></div>
+ </aside>
+ <main id="stage" aria-label="学习网络">
+  <button id="mobileMenu" class="mobile floating" aria-label="打开学习目录">☰</button>
+  <svg id="graph" xmlns="http://www.w3.org/2000/svg" tabindex="0" role="group" aria-label="学习图谱，左侧目录可替代图形操作"><defs id="markers"></defs><g id="viewport"><g id="links"></g><g id="nodes"></g></g></svg>
+  <div id="empty" hidden>没有符合筛选的节点。<button id="emptyReset">重置视图</button></div>
+  <div class="graph-tools"><button id="zoomIn" aria-label="放大">＋</button><button id="zoomOut" aria-label="缩小">−</button><span id="zoomLabel">100%</span><button id="fit">适应</button><button id="motion">暂停</button></div>
+ </main>
+</div>
+<div id="scrim" hidden></div><div id="toast" role="status" hidden></div>
+<input id="importFile" type="file" accept="application/json,.json" hidden>
+<dialog id="details"><div class="dialog-head"><h2 id="detailTitle"></h2><button data-close="details" class="icon" aria-label="关闭详情">×</button></div><div id="detailBody"></div></dialog>
+<dialog id="helpDialog"><div class="dialog-head"><h2>记录与计分</h2><button data-close="helpDialog" class="icon" aria-label="关闭说明">×</button></div>
+ <p>在左侧章节旁填写 <strong>0–100 分</strong>，勾选后标记完成。取消勾选可撤回，原分数和预计学时保留。</p>
+ <p>未完成节点及其连线保持灰色。完成后，节点、左侧勾选与分数、向外发出的箭头使用同一个红→黄→绿连续光谱。<strong>已完成的 0 分为红色</strong>，不同于未完成。</p>
+ <p>实线箭头：子节点 → 母节点。虚线箭头：前置节点 → 依赖它的同级节点。点线是可选知识关联。</p>
+ <p>母节点必须在全部学习子节点完成后才点亮。分数 = Σ（子节点分数 × 预计学时）÷ Σ 预计学时。课程学时为章节学时之和，领域按课程总学时加权。未完成时显示完成章节数，分数保持为空。</p>
+ <p>点击章节可修改预计学时。初值是含阅读、推导与练习的<strong>粗估权重，可修改，非官方学时</strong>。教材/视频/作业入口不单独计分；显示筛选不影响汇总，选修也不会因隐藏而自动完成。</p>
+ <p>记录自动保存在当前浏览器本机。更换浏览器、移动 HTML 或清理浏览器数据前，请导出记录备份；导入会先预览，再合并同名章节。</p>
+ <p class="muted">单击图节点定位目录；双击展开下层。拖空白平移，滚轮/双指缩放，拖节点固定。<kbd>/</kbd> 搜索，<kbd>Home</kbd> 适应，<kbd>Esc</kbd> 关闭。资料链接需要网络。</p>
+</dialog>
+<dialog id="importDialog"><div class="dialog-head"><h2>导入学习记录</h2><button data-close="importDialog" class="icon" aria-label="取消导入">×</button></div><p id="importPreview"></p><p class="muted">文件中的同名章节将覆盖当前记录，其余章节保留。</p><div class="dialog-actions"><button data-close="importDialog">取消</button><button id="confirmImport">合并导入</button></div></dialog>
+<noscript>请启用 JavaScript，或阅读同目录 README.md。</noscript>
+<script id="curriculum-data" type="application/json">/*__DATA__*/</script><script>/*__PROGRESS__*/</script><script>/*__APP__*/</script>
+</body></html>

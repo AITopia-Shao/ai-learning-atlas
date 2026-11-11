@@ -1,0 +1,36 @@
+name: Project checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Rebuild standalone HTML and graph data
+        run: python graph/build_graph.py
+      - name: Check project links and graph integrity
+        run: python scripts/check_project.py
+      - name: Check that generated files are committed
+        run: git diff --exit-code -- AI学习图谱.html graph/curriculum.json
+      - name: Test learning records and weighted scoring
+        run: node --test graph/progress.test.cjs
+      - name: Test browser interactions
+        env:
+          GRAPH_BROWSER: /usr/bin/google-chrome
+        run: node graph/qa.cjs

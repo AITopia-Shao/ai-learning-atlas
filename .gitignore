@@ -1,0 +1,25 @@
+# Personal learning exports and local publishing helpers
+.local/
+.env
+.env.*
+!.env.example
+ai-learning-progress*.json
+learning-progress*.json
+records*.json
+
+# Generated QA output, caches and packages
+graph/qa/
+graph/qa-progress/
+ai-learning-graph-qa-*/
+*.log
+*.zip
+dist/
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

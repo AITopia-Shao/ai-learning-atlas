@@ -1,0 +1,86 @@
+{
+  "checked_at": "2026-11-11",
+  "course": "CS336 Spring 2025",
+  "note": "Pinned historical course materials; no assignment code, data, GPU runs, or private services executed or validated.",
+  "assignments": [
+    {
+      "assignment": 1,
+      "repository": "stanford-cs336/assignment1-basics",
+      "sha": "430e2c844e29f8aad8f9330e8706db9cb508241f",
+      "commit_date": "2025-08-29T06:53:54Z",
+      "selection": "Latest commit before 2026-01-01; README verified as Spring 2025",
+      "tree_url": "https://github.com/stanford-cs336/assignment1-basics/tree/430e2c844e29f8aad8f9330e8706db9cb508241f",
+      "readme_url": "https://github.com/stanford-cs336/assignment1-basics/blob/430e2c844e29f8aad8f9330e8706db9cb508241f/README.md",
+      "handouts": [
+        {
+          "name": "cs336_spring2025_assignment1_basics.pdf",
+          "url": "https://github.com/stanford-cs336/assignment1-basics/blob/430e2c844e29f8aad8f9330e8706db9cb508241f/cs336_spring2025_assignment1_basics.pdf"
+        }
+      ]
+    },
+    {
+      "assignment": 2,
+      "repository": "stanford-cs336/assignment2-systems",
+      "sha": "e495ed740080661ab084914674d3e10048778889",
+      "commit_date": "2025-07-25T21:32:57Z",
+      "selection": "Latest commit before 2026-01-01; README verified as Spring 2025",
+      "tree_url": "https://github.com/stanford-cs336/assignment2-systems/tree/e495ed740080661ab084914674d3e10048778889",
+      "readme_url": "https://github.com/stanford-cs336/assignment2-systems/blob/e495ed740080661ab084914674d3e10048778889/README.md",
+      "handouts": [
+        {
+          "name": "cs336_spring2025_assignment2_systems.pdf",
+          "url": "https://github.com/stanford-cs336/assignment2-systems/blob/e495ed740080661ab084914674d3e10048778889/cs336_spring2025_assignment2_systems.pdf"
+        }
+      ]
+    },
+    {
+      "assignment": 3,
+      "repository": "stanford-cs336/assignment3-scaling",
+      "sha": "09d205bde59e5c533368c0209dc86a4d5e4323ea",
+      "commit_date": "2025-07-21T16:35:59Z",
+      "selection": "Latest commit before 2026-01-01; README verified as Spring 2025",
+      "tree_url": "https://github.com/stanford-cs336/assignment3-scaling/tree/09d205bde59e5c533368c0209dc86a4d5e4323ea",
+      "readme_url": "https://github.com/stanford-cs336/assignment3-scaling/blob/09d205bde59e5c533368c0209dc86a4d5e4323ea/README.md",
+      "handouts": [
+        {
+          "name": "cs336_spring2025_assignment3_scaling.pdf",
+          "url": "https://github.com/stanford-cs336/assignment3-scaling/blob/09d205bde59e5c533368c0209dc86a4d5e4323ea/cs336_spring2025_assignment3_scaling.pdf"
+        }
+      ]
+    },
+    {
+      "assignment": 4,
+      "repository": "stanford-cs336/assignment4-data",
+      "sha": "5a5f890cd9b72733e6273a596c40b696df3aa9df",
+      "commit_date": "2025-07-21T16:36:01Z",
+      "selection": "Latest commit before 2026-01-01; README verified as Spring 2025",
+      "tree_url": "https://github.com/stanford-cs336/assignment4-data/tree/5a5f890cd9b72733e6273a596c40b696df3aa9df",
+      "readme_url": "https://github.com/stanford-cs336/assignment4-data/blob/5a5f890cd9b72733e6273a596c40b696df3aa9df/README.md",
+      "handouts": [
+        {
+          "name": "cs336_spring2025_assignment4_data.pdf",
+          "url": "https://github.com/stanford-cs336/assignment4-data/blob/5a5f890cd9b72733e6273a596c40b696df3aa9df/cs336_spring2025_assignment4_data.pdf"
+        }
+      ]
+    },
+    {
+      "assignment": 5,
+      "repository": "stanford-cs336/assignment5-alignment",
+      "sha": "eb2c562e05802d3c9ee4c4ec2eec43b104d77e9e",
+      "commit_date": "2025-06-13T16:47:11Z",
+      "selection": "Latest commit before 2026-01-01; README verified as Spring 2025",
+      "tree_url": "https://github.com/stanford-cs336/assignment5-alignment/tree/eb2c562e05802d3c9ee4c4ec2eec43b104d77e9e",
+      "readme_url": "https://github.com/stanford-cs336/assignment5-alignment/blob/eb2c562e05802d3c9ee4c4ec2eec43b104d77e9e/README.md",
+      "handouts": [
+        {
+          "name": "cs336_spring2025_assignment5_alignment.pdf",
+          "url": "https://github.com/stanford-cs336/assignment5-alignment/blob/eb2c562e05802d3c9ee4c4ec2eec43b104d77e9e/cs336_spring2025_assignment5_alignment.pdf"
+        },
+        {
+          "name": "cs336_spring2025_assignment5_supplement_safety_rlhf.pdf",
+          "url": "https://github.com/stanford-cs336/assignment5-alignment/blob/eb2c562e05802d3c9ee4c4ec2eec43b104d77e9e/cs336_spring2025_assignment5_supplement_safety_rlhf.pdf"
+        }
+      ]
+    }
+  ]
+}
