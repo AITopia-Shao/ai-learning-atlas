@@ -34,7 +34,7 @@ node graph/qa.cjs
 | `graph/app.js`、`graph/layout.js` | 页面交互与图谱布局 |
 | `graph/progress.js` | 学习记录、验证和递归加权规则 |
 | `graph/template.html`、`graph/style.css` | 页面模板与样式 |
-| `graph/*.test.cjs`、`graph/qa.cjs`、`graph/browser-checks.cjs` | 规则测试与浏览器交互检查 |
+| `graph/*.test.cjs`、`graph/qa.cjs`、`graph/browser-checks.cjs`、`graph/recovery-checks.cjs` | 规则测试、浏览器交互及双页面恢复检查 |
 | `scripts/check_project.py` | 本地链接、资料覆盖、图数据及 HTML 一致性检查 |
 | `cs336_2025_versions.json` | CS336 2025 作业的历史提交与手册版本清单 |
 

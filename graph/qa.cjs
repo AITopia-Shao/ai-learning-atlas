@@ -16,7 +16,7 @@ function assert(ok,name,details){results.push({name,passed:!!ok,details});if(!ok
 (async()=>{
  let serial=0,sessionId,buffer='';const pending=new Map(),decoder=new StringDecoder('utf8');
  child.stdio[4].on('data',d=>{buffer+=decoder.write(d);let i;while((i=buffer.indexOf('\0'))!==-1){const raw=buffer.slice(0,i);buffer=buffer.slice(i+1);if(!raw)continue;const m=JSON.parse(raw);if(m.id){const p=pending.get(m.id);pending.delete(m.id);if(p)m.error?p.reject(m.error):p.resolve(m.result);}else if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails);else if(m.method==='Network.requestWillBeSent')requests.push(m.params.request.url);else if(m.method.startsWith('Browser.download'))fs.appendFileSync(path.join(out,'download-events.log'),JSON.stringify(m)+'\n');}});
- const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++serial;pending.set(id,{resolve,reject});const message={id,method,params};if(sessionId&&!/^(Browser|Target)\./.test(method))message.sessionId=sessionId;child.stdio[3].write(JSON.stringify(message)+'\0');});
+ const send=(method,params={},targetSessionId=sessionId)=>new Promise((resolve,reject)=>{const id=++serial;pending.set(id,{resolve,reject});const message={id,method,params};if(sessionId&&!/^(Browser|Target)\./.test(method))message.sessionId=targetSessionId;child.stdio[3].write(JSON.stringify(message)+'\0');});
  const target=await send('Target.createTarget',{url:'about:blank'});sessionId=(await send('Target.attachToTarget',{targetId:target.targetId,flatten:true})).sessionId;
  const evaluate=async expression=>{const r=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true,userGesture:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
  const click=selector=>evaluate(`document.querySelector(${JSON.stringify(selector)}).click()`);
@@ -29,6 +29,7 @@ function assert(ok,name,details){results.push({name,passed:!!ok,details});if(!ok
  await send('Page.navigate',{url:pathToFileURL(path.join(dir,'..','AI学习图谱.html')).href});
  for(let i=0;i<40;i++){await sleep(150);if(await evaluate(`document.body?.dataset.ready==='true'`))break;}
  await require("./browser-checks.cjs")({send,evaluate,click,change,shot,state,assert,sleep,out,errors,requests});
+ await require("./recovery-checks.cjs")({send,evaluate,click,assert,sleep});
  const report={passed:results.length,results,errors,remoteRequests:requests.filter(u=>/^https?:/.test(u)),testedAt:new Date().toISOString()};
  fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(report,null,2));console.log(JSON.stringify({passed:results.length,screenshots:fs.readdirSync(out).filter(n=>n.endsWith('.png')),errors},null,2));
  completed=true;await send('Browser.close');
